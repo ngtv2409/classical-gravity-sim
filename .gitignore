@@ -1,0 +1,6 @@
+build*
+*.out
+__*
+.cache
+log*
+.clangd
