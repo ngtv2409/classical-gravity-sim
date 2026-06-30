@@ -5,7 +5,21 @@
     </head>
 <body>
 
-<canvas id="canvas" width="800" height="600"></canvas>
+<div id="sim-area">
+
+<div id="sim-title">
+    <h1>N-Bodies Gravitation Simulation</h1>
+</div>
+
+<canvas id="sim-cv"></canvas>
+
+<div id="sim-ctl">
+    <h1>Control Panel</h1>
+    <button id="sim-start">Start/Reset</button>
+    <textarea id="sim-input"></textarea>
+</div>
+
+</div>
 
 <script src="sim_wasm.js"></script>
 <script src="script.js"></script>

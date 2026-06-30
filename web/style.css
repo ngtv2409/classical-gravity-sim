@@ -1,3 +1,69 @@
-#canvas {
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+h1 {
+    font-size: 11px;
+    text-align: center;
+}
+
+#sim-area {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 10px;
+
+    padding: 10px;
+    width: 100%;
+    height: 100%;
+}
+
+#sim-title {
+    background-color: lightblue;
+    padding: 2px;
+    grid-column: 1;
+    grid-row: 1;
+    border: blue solid 2px;
+    border-radius: 1px;
+}
+
+#sim-cv {
+    grid-column: 1;
+    grid-row: 2;
+
+    width: 100%;
+    height: 100%;
     border: 2px solid black;
+}
+
+#sim-ctl {
+    grid-column: 2;
+    grid-row: 1 / 3;
+
+    background-color: rgb(220, 220, 220);
+    border: 2px solid black;
+    padding: 10px;
+
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    gap: 10px;
+}
+
+#sim-ctl h1 {
+    margin: 0;
+    font-size: 14px;
+}
+
+#sim-start {
+    width: 100%;
+    padding: 8px;
+}
+
+#sim-input {
+    width: 100%;
+    height: 100%;
+    resize: none;
+    box-sizing: border-box;
 }

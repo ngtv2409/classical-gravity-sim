@@ -1,25 +1,25 @@
-let stop = false;
+const canvas = document.getElementById("sim-cv");
+const ctx = canvas.getContext("2d");
+const DT = 3600;
+const TIME_SCALE = 24*60*60*30;
 
-Module.onRuntimeInitialized = () => {
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
+let current_sim;
 
-    const bodySize = Module._sizeof_body();
-    const posOffset = Module._body_offset_pos();
-    const velOffset = Module._body_offset_vel();
-    const massOffset = Module._body_offset_mass();
-    const immutOffset = Module._body_offset_immutable();
-    const xOffset = Module._vec2_offset_x();
-    const yOffset = Module._vec2_offset_y();
+function resizeCanvas() {
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+}
 
-    const SCALE = 1e9;
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
 
-const AU = 149.6e9;
+const AU = 1.496e11;
+const SCALE = 1e9;
 
 const initialBodies = [
     {
         name: "Sun A",
-        x: -AU/2,
+        x: -AU / 2,
         y: 0,
         vx: 0,
         vy: 14900,
@@ -30,7 +30,7 @@ const initialBodies = [
     },
     {
         name: "Sun B",
-        x: AU/2,
+        x: AU / 2,
         y: 0,
         vx: 0,
         vy: -14900,
@@ -49,67 +49,162 @@ const initialBodies = [
         immutable: false,
         color: "blue",
         radius: 6
-    },
-];
-
-    const renderData = initialBodies.map(b => ({ color: b.color, radius: b.radius }));
-
-    function initUniverse(bodiesArray, eps = 0.01) {
-        const count = bodiesArray.length;
-        const ptr = Module._bodies_alloc(count);
-
-        bodiesArray.forEach((b, i) => {
-            const base = ptr + i * bodySize;
-            
-            HEAPF64[(base + posOffset + xOffset) >> 3] = b.x;
-            HEAPF64[(base + posOffset + yOffset) >> 3] = b.y;
-            
-            HEAPF64[(base + velOffset + xOffset) >> 3] = b.vx;
-            HEAPF64[(base + velOffset + yOffset) >> 3] = b.vy;
-            
-            HEAPF64[(base + massOffset) >> 3] = b.mass;
-            
-            HEAPU8[base + immutOffset] = b.immutable ? 1 : 0; 
-        });
-
-        Module._universe_init(ptr, count, eps);
-        Module._bodies_free(ptr);
     }
+];
+let current_bodies = initialBodies;
 
-    function draw() {
-        if (stop) {
-            return;
-        }
-        Module._universe_step(24 * 60 * 60);
+let Layout;
 
-        const ptr = Module._universe_bodies();
-        const bodiesCount = Module._universe_body_count();
+// reset
+function initUniverse(bodies, eps = 0.01) {
+    const ptr = Module._bodies_alloc(bodies.length);
+
+    bodies.forEach((body, i) => {
+        const base = ptr + i * Layout.bodySize;
+
+        HEAPF64[(base + Layout.posOffset + Layout.xOffset) >> 3] = body.x;
+        HEAPF64[(base + Layout.posOffset + Layout.yOffset) >> 3] = body.y;
+
+        HEAPF64[(base + Layout.velOffset + Layout.xOffset) >> 3] = body.vx;
+        HEAPF64[(base + Layout.velOffset + Layout.yOffset) >> 3] = body.vy;
+
+        HEAPF64[(base + Layout.massOffset) >> 3] = body.mass;
+
+        HEAPU8[base + Layout.immutableOffset] = body.immutable ? 1 : 0;
+    });
+
+    Module._universe_init(ptr, bodies.length, eps);
+    Module._bodies_free(ptr);
+}
+
+function stepUniverse(dt) {
+    Module._universe_step(dt);
+}
+
+function getBodies() {
+    return {
+        ptr: Module._universe_bodies(),
+        count: Module._universe_body_count()
+    };
+}
+
+function createRenderer(visuals) {
+    return function render() {
+        const { ptr, count } = getBodies();
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        const baseX = canvas.width / 2;
-        const baseY = canvas.height / 2;
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
 
-        for (let i = 0; i < bodiesCount; ++i) {
-            const base = ptr + i * bodySize;
+        for (let i = 0; i < count; i++) {
+            const base = ptr + i * Layout.bodySize;
 
-            const x = HEAPF64[(base + posOffset + xOffset) >> 3];
-            const y = HEAPF64[(base + posOffset + yOffset) >> 3];
+            const x = HEAPF64[(base + Layout.posOffset + Layout.xOffset) >> 3];
+            const y = HEAPF64[(base + Layout.posOffset + Layout.yOffset) >> 3];
 
-            const screenX = baseX + x / SCALE;
-            const screenY = baseY + y / SCALE; 
-
-            const visuals = renderData[i] || { radius: 3, color: "white" };
+            const body = visuals[i] || {
+                radius: 3,
+                color: "white"
+            };
+            const screenX = cx + x / SCALE;
+            const screenY = cy + y / SCALE;
 
             ctx.beginPath();
-            ctx.arc(screenX, screenY, visuals.radius, 0, Math.PI * 2);
-            ctx.fillStyle = visuals.color;
+            ctx.arc(
+                screenX,
+                screenY,
+                body.radius,
+                0,
+                Math.PI * 2
+            );
+            ctx.fillStyle = body.color;
             ctx.fill();
+            ctx.font = "12px sans-serif";
+            ctx.fillStyle = "black";
+            ctx.textAlign = "left";
+            ctx.textBaseline = "middle";
+            ctx.fillText(
+                body.name,
+                screenX + body.radius + 6,
+                screenY);
+        }
+    };
+}
+
+function startSimulation(bodies) {
+    let stopped = false;
+
+    const visuals = bodies.map(({ name, color, radius }) => ({
+        name,
+        color,
+        radius
+    }));
+
+    initUniverse(bodies);
+
+    const render = createRenderer(visuals);
+
+    function frame() {
+        if (stopped) return;
+
+        const now = performance.now() / 1000;
+
+        // Initialize both lastTime AND accumulator on the first frame
+        if (!frame.lastTime) {
+            frame.lastTime = now;
+            frame.accumulator = 0; 
         }
 
-        requestAnimationFrame(draw);
+        let delta = now - frame.lastTime;
+        frame.lastTime = now;
+
+        delta = Math.min(delta, 0.05);
+
+        frame.accumulator += delta * TIME_SCALE;
+
+        while (frame.accumulator >= DT) {
+            stepUniverse(DT);
+            frame.accumulator -= DT;
+        }
+
+        render();
+        requestAnimationFrame(frame);
     }
 
-    initUniverse(initialBodies);
-    draw();
+    requestAnimationFrame(frame);
+
+    return {
+        stop() {
+            stopped = true;
+        }
+    };
+}
+
+Module.onRuntimeInitialized = () => {
+    Layout = {
+        bodySize: Module._sizeof_body(),
+        posOffset: Module._body_offset_pos(),
+        velOffset: Module._body_offset_vel(),
+        massOffset: Module._body_offset_mass(),
+        immutableOffset: Module._body_offset_immutable(),
+        xOffset: Module._vec2_offset_x(),
+        yOffset: Module._vec2_offset_y()
+    };
+    const startbt = document.getElementById("sim-start");
+    const inputarea = document.getElementById("sim-input");
+    inputarea.value = JSON.stringify(initialBodies, null, 2);
+
+    current_sim = startSimulation(current_bodies);
+    startbt.addEventListener("click", () => {
+        try {
+            const newBodies = JSON.parse(inputarea.value);
+            current_sim.stop();
+            current_bodies = newBodies;
+            current_sim = startSimulation(current_bodies);
+        } catch (e) {
+            alert("Invalid JSON format: " + e);
+            console.error("Parsing error:", e);
+        }
+    });
 };
