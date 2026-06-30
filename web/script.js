@@ -13,6 +13,11 @@ Module.onRuntimeInitialized = () => {
     renderEditor();
     current_sim = startSimulation(current_bodies, currentSimParam.eps);
     startbt.addEventListener("click", () => {
+        const invalids = findInvalidBodies(inputbuffer);
+        if (invalids.length !== 0) {
+            alert("Incorrect input for {" + invalids + "}");
+            return;
+        }
         current_sim?.stop();
         currentSimParam = structuredClone(inputSimParam);
         current_bodies = structuredClone(inputbuffer);

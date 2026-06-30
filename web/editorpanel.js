@@ -10,32 +10,32 @@ function createBodyRow(body, index) {
 
         <div class="field">
             <label>X</label>
-            <input class="x" type="number" value="${body.x}">
+            <input class="x" type="text" value="${body.x}">
         </div>
 
         <div class="field">
             <label>Y</label>
-            <input class="y" type="number" value="${body.y}">
+            <input class="y" type="text" value="${body.y}">
         </div>
 
         <div class="field">
             <label>VX</label>
-            <input class="vx" type="number" value="${body.vx}">
+            <input class="vx" type="text" value="${body.vx}">
         </div>
 
         <div class="field">
             <label>VY</label>
-            <input class="vy" type="number" value="${body.vy}">
+            <input class="vy" type="text" value="${body.vy}">
         </div>
 
         <div class="field">
             <label>Mass</label>
-            <input class="mass" type="number" value="${body.mass}">
+            <input class="mass" type="text" value="${body.mass}">
         </div>
 
         <div class="field">
             <label>Radius</label>
-            <input class="radius" type="number" value="${body.radius}">
+            <input class="radius" type="text" value="${body.radius}">
         </div>
 
         <div class="field">
@@ -49,13 +49,21 @@ function createBodyRow(body, index) {
         </div>
     `;
 
+    function tryParseFloat(value) {
+        const n = Number(value.trim());
+
+        if (!Number.isFinite(n)) {
+            return null;
+        }
+        return n;
+    }
     div.querySelector(".name").oninput = e => inputbuffer[index].name = e.target.value;
-    div.querySelector(".x").oninput = e => inputbuffer[index].x = +e.target.value;
-    div.querySelector(".y").oninput = e => inputbuffer[index].y = +e.target.value;
-    div.querySelector(".vx").oninput = e => inputbuffer[index].vx = +e.target.value;
-    div.querySelector(".vy").oninput = e => inputbuffer[index].vy = +e.target.value;
-    div.querySelector(".mass").oninput = e => inputbuffer[index].mass = +e.target.value;
-    div.querySelector(".radius").oninput = e => inputbuffer[index].radius = +e.target.value;
+    div.querySelector(".x").oninput = e => inputbuffer[index].x = tryParseFloat(e.target.value);
+    div.querySelector(".y").oninput = e => inputbuffer[index].y = tryParseFloat(e.target.value);
+    div.querySelector(".vx").oninput = e => inputbuffer[index].vx = tryParseFloat(e.target.value);
+    div.querySelector(".vy").oninput = e => inputbuffer[index].vy = tryParseFloat(e.target.value);
+    div.querySelector(".mass").oninput = e => inputbuffer[index].mass = tryParseFloat(e.target.value);
+    div.querySelector(".radius").oninput = e => inputbuffer[index].radius = tryParseFloat(e.target.value);
     div.querySelector(".color").oninput = e => inputbuffer[index].color = e.target.value;
 
     div.querySelector(".remove").onclick = () => {
@@ -64,6 +72,16 @@ function createBodyRow(body, index) {
     };
 
     return div;
+}
+
+function findInvalidBodies(buffer) {
+    const invalidIndices = buffer
+        .map((obj, idx) =>
+            Object.values(obj).some(v => v == null) ? idx : -1
+        )
+        .filter(idx => idx !== -1);
+
+    return invalidIndices;
 }
 
 let inputbuffer = structuredClone(initialBodies);
