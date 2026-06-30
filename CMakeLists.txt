@@ -32,17 +32,9 @@ if(EMSCRIPTEN)
     # Copy frontend files
     add_custom_target(copyasset ALL
 
-        COMMAND ${CMAKE_COMMAND} -E copy
-            ${CMAKE_SOURCE_DIR}/web/index.html
-            ${CMAKE_CURRENT_BINARY_DIR}/index.html
-
-        COMMAND ${CMAKE_COMMAND} -E copy
-            ${CMAKE_SOURCE_DIR}/web/script.js
-            ${CMAKE_CURRENT_BINARY_DIR}/script.js
-
-        COMMAND ${CMAKE_COMMAND} -E copy
-            ${CMAKE_SOURCE_DIR}/web/style.css
-            ${CMAKE_CURRENT_BINARY_DIR}/style.css
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_SOURCE_DIR}/web/.
+            ${CMAKE_CURRENT_BINARY_DIR}
     )
 
 endif()
