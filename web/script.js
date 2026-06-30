@@ -1,7 +1,40 @@
 const canvas = document.getElementById("sim-cv");
 const ctx = canvas.getContext("2d");
-const DT = 3600;
-const TIME_SCALE = 24*60*60*30;
+
+const defaultSimParam = {
+    eps: 0.1,
+    dt: 3600
+}
+const defaultDisParam = {
+    showlab: true,
+    time_scale: 24*60*60*30
+}
+let currentSimParam = structuredClone(defaultSimParam);
+let currentDisParam = structuredClone(defaultDisParam);
+
+let inputSimParam = structuredClone(defaultSimParam);
+
+const inpshowlab = document.getElementById("cfg-show-lab");
+inpshowlab.addEventListener("input", () => {
+    currentDisParam.showlab = inpshowlab.checked;
+});
+const inptimescale = document.getElementById("cfg-timescale");
+inptimescale.addEventListener("input", () => {
+    currentDisParam.time_scale = inptimescale.value;
+});
+let noticed = false;
+const inpdt = document.getElementById("cfg-dt");
+inpdt.addEventListener("input", () => {
+    if (!noticed) {
+        alert("Warning: changing dt too low can crash the browser.");
+        noticed = true;
+    }
+    inputSimParam.dt = inpdt.value;
+});
+const inpeps = document.getElementById("cfg-eps");
+inpeps.addEventListener("input", () => {
+    inputSimParam.eps = inpeps.value;
+});
 
 let current_sim;
 
@@ -118,21 +151,23 @@ function createRenderer(visuals) {
                 0,
                 Math.PI * 2
             );
-            ctx.fillStyle = body.color;
-            ctx.fill();
-            ctx.font = "12px sans-serif";
-            ctx.fillStyle = "black";
-            ctx.textAlign = "left";
-            ctx.textBaseline = "middle";
-            ctx.fillText(
-                body.name,
-                screenX + body.radius + 6,
-                screenY);
+                ctx.fillStyle = body.color;
+                ctx.fill();
+            if (currentDisParam.showlab) {
+                ctx.font = "12px sans-serif";
+                ctx.fillStyle = "black";
+                ctx.textAlign = "left";
+                ctx.textBaseline = "middle";
+                ctx.fillText(
+                    body.name,
+                    screenX + body.radius + 6,
+                    screenY);
+            }
         }
     };
 }
 
-function startSimulation(bodies) {
+function startSimulation(bodies, eps) {
     let stopped = false;
 
     const visuals = bodies.map(({ name, color, radius }) => ({
@@ -141,7 +176,7 @@ function startSimulation(bodies) {
         radius
     }));
 
-    initUniverse(bodies);
+    initUniverse(bodies, eps);
 
     const render = createRenderer(visuals);
 
@@ -161,11 +196,11 @@ function startSimulation(bodies) {
 
         delta = Math.min(delta, 0.05);
 
-        frame.accumulator += delta * TIME_SCALE;
+        frame.accumulator += delta * currentDisParam.time_scale;
 
-        while (frame.accumulator >= DT) {
-            stepUniverse(DT);
-            frame.accumulator -= DT;
+        while (frame.accumulator >= currentSimParam.dt) {
+            stepUniverse(currentSimParam.dt);
+            frame.accumulator -= currentSimParam.dt;
         }
 
         render();
@@ -289,10 +324,11 @@ Module.onRuntimeInitialized = () => {
     const startbt = document.getElementById("sim-start");
 
     renderEditor();
-    current_sim = startSimulation(current_bodies);
+    current_sim = startSimulation(current_bodies, currentSimParam.eps);
     startbt.addEventListener("click", () => {
         current_sim?.stop();
+        currentSimParam = structuredClone(inputSimParam);
         current_bodies = structuredClone(inputbuffer);
-        current_sim = startSimulation(current_bodies);
+        current_sim = startSimulation(current_bodies, currentSimParam.eps);
     });
 };

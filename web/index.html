@@ -19,6 +19,32 @@
         <button id="sim-start">Start/Reset</button>
         <button id="sim-body-add">Add</button>
     </div>
+    <details id="dis-settings">
+        <summary>Display Settings</summary>
+        <label>
+            <input type="checkbox" id="cfg-show-lab" value="no" checked>
+            Show label
+
+            <div class="field">
+                <label>Time Scale</label>
+                <input id="cfg-timescale" type="number" value="2592000">
+            </div>
+        </label>
+    </details>
+    <details id="sim-settings">
+        <summary>Simulation Settings</summary>
+
+        <div class="field">
+            <label>Time Step (DT) - Advanced !!</label>
+            <input id="cfg-dt" type="number" value="3600">
+        </div>
+
+        <div class="field">
+            <label>Softening (epsilon)</label>
+            <input id="cfg-eps" type="number" step="0.001" value="0.01">
+        </div>
+
+    </details>
     <div id="body-panel"></div>
 </div>
 
