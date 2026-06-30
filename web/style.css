@@ -47,7 +47,7 @@ h1 {
     padding: 10px;
 
     display: grid;
-    grid-template-rows: auto auto 1fr;
+    grid-template-rows: auto auto auto auto 1fr;
     gap: 10px;
 }
 
@@ -68,7 +68,7 @@ h1 {
     overflow-x: hidden;
     overflow-y: auto;
 
-    background-color: lightblue;
+    background-color: #444;
     border: 2px solid black;
     gap: 10px;
 }
