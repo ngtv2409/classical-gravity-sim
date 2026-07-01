@@ -1,7 +1,9 @@
 const AU = 1.496e11;
 export const defaultDisplay = {
     showLabels: true,
-    timeScale: 24*60*60*30
+    timeScale: 24*60*60*30,
+    showGrid: true,
+    showCoord: false
 };
 export const defaultSimulation = {
     bodies: [

@@ -9,6 +9,17 @@ h1 {
     text-align: center;
 }
 
+canvas {
+    touch-action: none;
+}
+
+label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+}
+
 #sim-area {
     display: grid;
     grid-template-columns: 3fr 1fr;

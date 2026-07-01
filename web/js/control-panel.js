@@ -157,17 +157,29 @@ export function setup_control_panel(app) {
     });
 
     const inpshowlab = document.getElementById("cfg-show-lab");
+    const inpshowgrid = document.getElementById("cfg-show-grid");
+    const inpshowcoord = document.getElementById("cfg-show-coord");
     const inptimescale = document.getElementById("cfg-timescale");
     const inpdt = document.getElementById("cfg-dt");
     const inpeps = document.getElementById("cfg-eps");
 
     inpshowlab.checked = app.display.showLabels;
+    inpshowgrid.checked = app.display.showGrid;
+    inpshowcoord.checked = app.display.showCoord;
     inptimescale.value = app.display.timeScale;
     inpdt.value = app.editor.params.dt;
     inpeps.value = app.editor.params.eps;
 
     inpshowlab.addEventListener("input", () => {
         app.display.showLabels = inpshowlab.checked;
+        localStorage.setItem("appsave", JSON.stringify(app));
+    });
+    inpshowgrid.addEventListener("input", () => {
+        app.display.showGrid = inpshowgrid.checked;
+        localStorage.setItem("appsave", JSON.stringify(app));
+    });
+    inpshowcoord.addEventListener("input", () => {
+        app.display.showCoord = inpshowcoord.checked;
         localStorage.setItem("appsave", JSON.stringify(app));
     });
     inptimescale.addEventListener("input", () => {
