@@ -126,4 +126,26 @@ export function setup_control_panel(app) {
 
         renderEditor(app.editor.bodies);
     });
+
+    const inpshowlab = document.getElementById("cfg-show-lab");
+    inpshowlab.addEventListener("input", () => {
+        app.display.showLabels = inpshowlab.checked;
+    });
+    const inptimescale = document.getElementById("cfg-timescale");
+    inptimescale.addEventListener("input", () => {
+        app.display.timeScale = inptimescale.value;
+    });
+    let noticed = false;
+    const inpdt = document.getElementById("cfg-dt");
+    inpdt.addEventListener("input", () => {
+        if (!noticed) {
+            alert("Warning: changing dt too low can crash the browser.");
+            noticed = true;
+        }
+        app.editor.params.dt = inpdt.value;
+    });
+    const inpeps = document.getElementById("cfg-eps");
+    inpeps.addEventListener("input", () => {
+        app.editor.params.eps = inpeps.value;
+    });
 }
