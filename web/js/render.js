@@ -83,9 +83,11 @@ export function resizeCanvas() {
 }
 window.addEventListener("resize", resizeCanvas);
 
-export function createRenderer(app, visuals) {
+export function createRenderer(app, visuals, trails) {
+
     return function render() {
         const bodies = getBodies();
+        const MAX_TRAIL = 250 * bodies.length;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -98,24 +100,73 @@ export function createRenderer(app, visuals) {
         let i = 0;
         for (const rawbody of bodies) {
             const [x, y] = getPos(rawbody);
-
             const body = visuals[i] || {
+                name: "Noname",
                 radius: 3,
-                color: "#000000"
+                color: "#000000",
             };
+
+            trails.push({
+                body: i,
+                x,
+                y,
+                color: body.color,
+            });
+
+            i++;
+        }
+
+        while (trails.length > MAX_TRAIL) {
+            trails.shift();
+        }
+
+        if (app.display.showTrail) {
+            for (let i = 0; i < visuals.length; i++) {
+                const points = trails.filter(t => t.body === i);
+
+                for (let j = 1; j < points.length; j++) {
+                    const a = points[j - 1];
+                    const b = points[j];
+
+                    const alpha = j / (points.length - 1); // 0 → 1
+
+                    ctx.beginPath();
+                    ctx.moveTo(
+                        cx + (a.x - camera.x) / SCALE,
+                        cy + (a.y - camera.y) / SCALE
+                    );
+                    ctx.lineTo(
+                        cx + (b.x - camera.x) / SCALE,
+                        cy + (b.y - camera.y) / SCALE
+                    );
+
+                    ctx.strokeStyle = points[j].color;
+                    ctx.globalAlpha = alpha;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        i = 0;
+        for (const rawbody of bodies) {
+            const [x, y] = getPos(rawbody);
+            const body = visuals[i] || {
+                name: "Noname",
+                radius: 3,
+                color: "#000000",
+            };
+
             const screenX = cx + (x - camera.x) / SCALE;
             const screenY = cy + (y - camera.y) / SCALE;
 
             ctx.beginPath();
-            ctx.arc(
-                screenX,
-                screenY,
-                body.radius,
-                0,
-                Math.PI * 2
-            );
-                ctx.fillStyle = body.color;
-                ctx.fill();
+            ctx.arc(screenX, screenY, body.radius, 0, Math.PI * 2);
+            ctx.fillStyle = body.color;
+            ctx.fill();
+
             if (app.display.showLabels) {
                 ctx.font = "12px sans-serif";
                 ctx.fillStyle = "black";
@@ -124,9 +175,11 @@ export function createRenderer(app, visuals) {
                 ctx.fillText(
                     body.name,
                     screenX + body.radius + 6,
-                    screenY);
+                    screenY
+                );
             }
-            i = i + 1;
+
+            i++;
         }
     };
 }

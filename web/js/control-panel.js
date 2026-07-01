@@ -159,6 +159,7 @@ export function setup_control_panel(app) {
     const inpshowlab = document.getElementById("cfg-show-lab");
     const inpshowgrid = document.getElementById("cfg-show-grid");
     const inpshowcoord = document.getElementById("cfg-show-coord");
+    const inpshowtrail = document.getElementById("cfg-show-trail");
     const inptimescale = document.getElementById("cfg-timescale");
     const inpdt = document.getElementById("cfg-dt");
     const inpeps = document.getElementById("cfg-eps");
@@ -166,6 +167,7 @@ export function setup_control_panel(app) {
     inpshowlab.checked = app.display.showLabels;
     inpshowgrid.checked = app.display.showGrid;
     inpshowcoord.checked = app.display.showCoord;
+    inpshowtrail.checked = app.display.showTrail;
     inptimescale.value = app.display.timeScale;
     inpdt.value = app.editor.params.dt;
     inpeps.value = app.editor.params.eps;
@@ -180,6 +182,10 @@ export function setup_control_panel(app) {
     });
     inpshowcoord.addEventListener("input", () => {
         app.display.showCoord = inpshowcoord.checked;
+        localStorage.setItem("appsave", JSON.stringify(app));
+    });
+    inpshowtrail.addEventListener("input", () => {
+        app.display.showTrail = inpshowtrail.checked;
         localStorage.setItem("appsave", JSON.stringify(app));
     });
     inptimescale.addEventListener("input", () => {

@@ -3,48 +3,49 @@ export const defaultDisplay = {
     showLabels: true,
     timeScale: 24*60*60*30,
     showGrid: true,
-    showCoord: false
+    showCoord: false,
+    showTrail: true
 };
 export const defaultSimulation = {
-    bodies: [
-        {
-            name: "Sun A",
-            x: -AU / 2,
-            y: 0,
-            vx: 0,
-            vy: 14900,
-            mass: 1.989e30,
-            immutable: false,
-            color: "#000000",
-            radius: 12
-        },
-        {
-            name: "Sun B",
-            x: AU / 2,
-            y: 0,
-            vx: 0,
-            vy: -14900,
-            mass: 1.989e30,
-            immutable: false,
-            color: "#000000",
-            radius: 12
-        },
-        {
-            name: "Sun C",
-            x: AU,
-            y: AU,
-            vx: 0,
-            vy: 0,
-            mass: 1.989e19,
-            immutable: false,
-            color: "#000000",
-            radius: 6
-        }
-    ],
-    params: {
-        eps: 0.1,
-        dt: 3600
+  "bodies": [
+    {
+      "name": "Body 1",
+      "x": 145109934000,
+      "y": -36382782000,
+      "vx": 13883.8,
+      "vy": 12875.2,
+      "mass": 1.989e30,
+      "immutable": false,
+      "color": "#FF5555",
+      "radius": 10
+    },
+    {
+      "name": "Body 2",
+      "x": -145109934000,
+      "y": 36382782000,
+      "vx": 13883.8,
+      "vy": 12875.2,
+      "mass": 1.989e30,
+      "immutable": false,
+      "color": "#55AAFF",
+      "radius": 10
+    },
+    {
+      "name": "Body 3",
+      "x": 0,
+      "y": 0,
+      "vx": -27767.6,
+      "vy": -25750.4,
+      "mass": 1.989e30,
+      "immutable": false,
+      "color": "#55FF55",
+      "radius": 10
     }
+  ],
+  "params": {
+    "eps": 0.1,
+    "dt": 300
+  }
 };
 
 export const app = {

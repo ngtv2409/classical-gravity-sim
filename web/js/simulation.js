@@ -7,12 +7,12 @@ export function startSimulation(app) {
     const visuals = app.simulation.bodies.map(({ name, color, radius }) => ({
         name,
         color,
-        radius
+        radius,
     }));
 
     initUniverse(app.simulation.bodies, app.simulation.params.eps);
 
-    const render = createRenderer(app, visuals);
+    const render = createRenderer(app, visuals, []);
 
     function frame() {
         if (stopped) return;
