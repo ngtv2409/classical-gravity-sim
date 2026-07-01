@@ -20,6 +20,12 @@ if(EMSCRIPTEN)
 
         "-sWASM=1"
 
+        "-sMODULARIZE=1"
+
+        "-sEXPORT_ES6=1"
+
+        "-sEXPORTED_RUNTIME_METHODS=['HEAPF64','HEAPU8']"
+
         "-sALLOW_MEMORY_GROWTH=1"
 
         "-sENVIRONMENT=web"
