@@ -115,3 +115,50 @@ h1 {
     padding: 0 12px;
     cursor: pointer;
 }
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    justify-items: center;
+    align-items: center;
+}
+.modal-content {
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    background: white;
+    width: 80%;
+    height: 80%;
+    margin: 100px auto;
+    padding: 20px;
+    gap: 10px;
+    border-radius: 8px;
+}
+
+#json-text {
+}
+
+.modal-hdr {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-other-btns {
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+.modal-btns {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    padding: 5px;
+}
+
+.modal-btns button {
+    height: 34px;
+    padding: 0 12px;
+    cursor: pointer;
+}

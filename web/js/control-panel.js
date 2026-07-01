@@ -1,5 +1,18 @@
 import { startSimulation } from "./simulation.js";
-import { to_default } from "./state.js";
+import { to_default, isSimulation } from "./state.js";
+
+function downloadString(content, filename, mimeType = "text/plain") {
+  const blob = new Blob([content], { type: mimeType });
+
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
 
 function createBodyRow(app, body, index) {
     let inputbuffer = app.editor.bodies;
@@ -174,4 +187,58 @@ export function setup_control_panel(app) {
         app.editor.params.eps = inpeps.value;
         localStorage.setItem("appsave", JSON.stringify(app));
     });
+
+    const modal = document.getElementById("modal");
+
+    document.getElementById("sim-import").onclick = () => {
+        modal.style.display = "flex";
+    };
+
+    document.getElementById("modal-import-close").onclick = () => {
+        modal.style.display = "none";
+    };
+    document.getElementById("modal-import-x").onclick = () => {
+        modal.style.display = "none";
+    };
+
+    function importSimJson(value) {
+        console.log("JSON import: "+value);
+        if (!value) { return; }
+        let obj;
+        try {
+            obj = JSON.parse(value);
+            if (!isSimulation(obj)) { return; }
+            app.editor = obj;
+            renderEditor(app);
+        } catch (e) {
+            alert("Parse error: " + e);
+        }
+    }
+    document.getElementById("modal-import-ok").onclick = () => {
+        const value = document.getElementById("json-text").value;
+        importSimJson(value);
+        modal.style.display = "none";
+    };
+    
+    const fileinput = document.getElementById("import-filejson");
+    document.getElementById("modal-import-json").onclick = () => {
+        fileinput.click();
+    }
+    fileinput.addEventListener("change", async () => {
+        const file = fileinput.files[0];
+        if (!file) return;
+        const text = await file.text();
+        importSimJson(text);
+        modal.style.display = "none";
+    });
+
+    document.getElementById("sim-export").onclick = () => {
+        const json = JSON.stringify(app.simulation);
+        const export_name = (prompt("Export name: ")??"data") + ".json";
+        downloadString(
+          json,
+          export_name,
+          "application/json"
+        );
+    }
 }

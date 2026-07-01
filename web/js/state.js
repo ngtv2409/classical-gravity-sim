@@ -58,3 +58,24 @@ export function to_default(app) {
     app.display = structuredClone(defaultDisplay);
     app.sim = null;
 }
+
+export function isSimulation(obj) {
+  return (
+    obj &&
+    Array.isArray(obj.bodies) &&
+    obj.bodies.every(body =>
+      typeof body.name === "string" &&
+      typeof body.x === "number" &&
+      typeof body.y === "number" &&
+      typeof body.vx === "number" &&
+      typeof body.vy === "number" &&
+      typeof body.mass === "number" &&
+      typeof body.immutable === "boolean" &&
+      typeof body.color === "string" &&
+      typeof body.radius === "number"
+    ) &&
+    obj.params &&
+    typeof obj.params.eps === "number" &&
+    typeof obj.params.dt === "number"
+  );
+}

@@ -13,12 +13,35 @@
 
 <canvas id="sim-cv"></canvas>
 
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-hdr">
+            <h3>import simulation</h3>
+            <button id="modal-import-x">X</button>
+        </div>
+
+        <div class="modal-other-btns">
+            <button id="modal-import-json">Import from JSON file</button>
+            <input type="file" id="import-filejson" accept=".json,application/json" hidden>
+        </div>
+
+        <textarea id="json-text" type="text"></textarea>
+
+        <div class="modal-btns">
+            <button id="modal-import-close">close</button>
+            <button id="modal-import-ok">ok</button>
+        </div>
+    </div>
+</div>
+
 <div id="sim-ctl">
     <h1>Control Panel</h1>
     <div id="sim-ctl-btns">
         <button id="sim-start">Start</button>
         <button id="sim-reset">Reset</button>
         <button id="sim-body-add">Add</button>
+        <button id="sim-import">Import</button>
+        <button id="sim-export">Export</button>
     </div>
     <details id="dis-settings">
         <summary>Display Settings</summary>
