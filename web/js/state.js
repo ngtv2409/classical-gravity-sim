@@ -47,7 +47,7 @@ export const defaultSimulation = {
 
 export const app = {
     simulation: structuredClone(defaultSimulation),
-    editor:structuredClone(defaultSimulation),
+    editor: structuredClone(defaultSimulation),
     display: structuredClone(defaultDisplay),
     sim: null
 };
