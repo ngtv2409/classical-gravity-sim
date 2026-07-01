@@ -1,4 +1,5 @@
 import { startSimulation } from "./simulation.js";
+import { to_default } from "./state.js";
 
 function createBodyRow(app, body, index) {
     let inputbuffer = app.editor.bodies;
@@ -102,7 +103,7 @@ function renderEditor(app) {
 
 export function setup_control_panel(app) {
     renderEditor(app);
-    document.getElementById("sim-start").addEventListener("click", () => {
+    function sim() {
         let invalids = findInvalidBodies(app.editor.bodies);
         if (invalids.length != 0) {
             if (invalids.length !== 0) {
@@ -114,6 +115,16 @@ export function setup_control_panel(app) {
         app.simulation = structuredClone(app.editor);
         app.sim = startSimulation(app);
         localStorage.setItem("appsave", JSON.stringify(app));
+    }
+    document.getElementById("sim-start").addEventListener("click", () => {
+        sim()
+    });
+    document.getElementById("sim-reset").addEventListener("click", () => {
+        const confirmed = confirm("This will reset everything to the default state");
+        if (confirmed) {
+            to_default(app);
+            sim();
+        }
     });
 
     document.getElementById("sim-body-add").addEventListener("click", () => {

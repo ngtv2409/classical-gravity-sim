@@ -51,3 +51,10 @@ export const app = {
     display: structuredClone(defaultDisplay),
     sim: null
 };
+
+export function to_default(app) {
+    app.simulation = structuredClone(defaultSimulation);
+    app.editor = structuredClone(defaultSimulation);
+    app.display = structuredClone(defaultDisplay);
+    app.sim = null;
+}
