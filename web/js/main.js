@@ -7,6 +7,18 @@ import { setup_control_panel } from "./control-panel.js";
 
 const Module = await createModule();
 
+try {
+    let save = localStorage.getItem("appsave");
+    console.log("Save: " + save);
+    if (save) {
+        let savestate = JSON.parse(save);
+        Object.assign(app, structuredClone(savestate));
+    }
+} catch (e) {
+    console.log("Load error: " + e);
+    alert("Invalid save. Using default");
+}
+
 initPhysics(Module);
 resizeCanvas();
 app.sim = startSimulation(app);

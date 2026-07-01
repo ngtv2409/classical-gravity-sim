@@ -1,6 +1,7 @@
 import { startSimulation } from "./simulation.js";
 
-function createBodyRow(inputbuffer, body, index) {
+function createBodyRow(app, body, index) {
+    let inputbuffer = app.editor.bodies;
     const div = document.createElement("div");
     div.className = "body-row";
 
@@ -70,7 +71,7 @@ function createBodyRow(inputbuffer, body, index) {
 
     div.querySelector(".remove").onclick = () => {
         inputbuffer.splice(index, 1);
-        renderEditor(inputbuffer);
+        renderEditor(app);
     };
 
     return div;
@@ -86,18 +87,21 @@ function findInvalidBodies(buffer) {
     return invalidIndices;
 }
 
-function renderEditor(inputbuffer) {
+function renderEditor(app) {
     const container = document.getElementById("body-panel");
     container.innerHTML = "";
 
-    inputbuffer.forEach((body, i) => {
-        const row = createBodyRow(inputbuffer, body, i);
+    app.editor.bodies.forEach((body, i) => {
+        const row = createBodyRow(app, body, i);
         container.appendChild(row);
     });
+
+    // editor render when changes, save here
+    localStorage.setItem("appsave", JSON.stringify(app));
 }
 
 export function setup_control_panel(app) {
-    renderEditor(app.editor.bodies);
+    renderEditor(app);
     document.getElementById("sim-start").addEventListener("click", () => {
         let invalids = findInvalidBodies(app.editor.bodies);
         if (invalids.length != 0) {
@@ -109,6 +113,7 @@ export function setup_control_panel(app) {
         app.sim?.stop();
         app.simulation = structuredClone(app.editor);
         app.sim = startSimulation(app);
+        localStorage.setItem("appsave", JSON.stringify(app));
     });
 
     document.getElementById("sim-body-add").addEventListener("click", () => {
@@ -124,28 +129,38 @@ export function setup_control_panel(app) {
             immutable: false
         });
 
-        renderEditor(app.editor.bodies);
+        renderEditor(app);
     });
 
     const inpshowlab = document.getElementById("cfg-show-lab");
+    const inptimescale = document.getElementById("cfg-timescale");
+    const inpdt = document.getElementById("cfg-dt");
+    const inpeps = document.getElementById("cfg-eps");
+
+    inpshowlab.checked = app.display.showLabels;
+    inptimescale.value = app.display.timeScale;
+    inpdt.value = app.editor.params.dt;
+    inpeps.value = app.editor.params.eps;
+
     inpshowlab.addEventListener("input", () => {
         app.display.showLabels = inpshowlab.checked;
+        localStorage.setItem("appsave", JSON.stringify(app));
     });
-    const inptimescale = document.getElementById("cfg-timescale");
     inptimescale.addEventListener("input", () => {
         app.display.timeScale = inptimescale.value;
+        localStorage.setItem("appsave", JSON.stringify(app));
     });
     let noticed = false;
-    const inpdt = document.getElementById("cfg-dt");
     inpdt.addEventListener("input", () => {
         if (!noticed) {
             alert("Warning: changing dt too low can crash the browser.");
             noticed = true;
         }
         app.editor.params.dt = inpdt.value;
+        localStorage.setItem("appsave", JSON.stringify(app));
     });
-    const inpeps = document.getElementById("cfg-eps");
     inpeps.addEventListener("input", () => {
         app.editor.params.eps = inpeps.value;
+        localStorage.setItem("appsave", JSON.stringify(app));
     });
 }
